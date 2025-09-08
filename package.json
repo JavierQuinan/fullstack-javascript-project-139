@@ -1,0 +1,27 @@
+{
+  "name": "fullstack-javascript-project-139",
+  "version": "1.0.0",
+  "description": "[![Actions Status](https://github.com/JavierQuinan/fullstack-javascript-project-139/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/JavierQuinan/fullstack-javascript-project-139/actions)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx chat-server ./frontend/build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JavierQuinan/fullstack-javascript-project-139.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JavierQuinan/fullstack-javascript-project-139/issues"
+  },
+  "homepage": "https://github.com/JavierQuinan/fullstack-javascript-project-139#readme",
+  "dependencies": {
+    "@hexlet/chat-server": "^2.0.4",
+    "axios": "^1.11.0",
+    "bootstrap": "^5.3.8",
+    "react-bootstrap": "^2.10.10"
+  }
+}
