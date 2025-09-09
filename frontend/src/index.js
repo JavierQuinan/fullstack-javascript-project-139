@@ -1,12 +1,15 @@
-import React from 'react';
+// frontend/src/index.js
+// import React from 'react'; // Se elimina si no usamos React directamente
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './index.css';
+import reportWebVitals from './reportWebVitals';
+import init from './init.jsx';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
-);
+
+init().then((vdom) => {
+  root.render(vdom);
+});
+
+reportWebVitals();
