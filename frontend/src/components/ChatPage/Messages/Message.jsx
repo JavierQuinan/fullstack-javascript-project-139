@@ -3,12 +3,7 @@ import React from 'react';
 
 const Message = ({ message }) => (
   <li>
-    <strong>
-      {message.username || 'anon'}
-      :
-    </strong>
-    {' '}
-    {message.body}
+    <strong>{message.username || 'anon'}:</strong> {message.body}
   </li>
 );
 
