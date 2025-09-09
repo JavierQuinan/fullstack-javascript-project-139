@@ -43,6 +43,11 @@ api.interceptors.response.use(
   },
 );
 
+export const getData = async () => {
+  const { data } = await api.get('/data');
+  return data;
+};
+
 // ----- FUNCIONES DE LOGIN, SIGNUP, GET CHANNELS, GET MESSAGES ----- //
 export const login = async (username, password) => {
   try {
