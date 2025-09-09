@@ -1,25 +1,25 @@
 // frontend/src/components/ChatPage/Messages/MessagesBox.jsx
 import React from 'react';
 import { useSelector } from 'react-redux';
-import Message from './Message.jsx';
+import { useTranslation } from 'react-i18next';
 
 const MessagesBox = () => {
-  const messagesState = useSelector((s) => s.messages);
-  const currentChannelId = useSelector((s) => s.channels.currentChannelId);
+  const { t } = useTranslation();
+  const messages = useSelector((state) => state.messages.items) || [];
+  const currentChannelId = useSelector((state) => state.channels.currentChannelId);
 
-  const all = messagesState?.items || [];
-  const visible = currentChannelId == null
-    ? all
-    : all.filter((m) => m.channelId === currentChannelId);
+  const filteredMessages = currentChannelId == null
+    ? messages
+    : messages.filter((msg) => msg.channelId === currentChannelId);
 
   return (
     <div>
+      <h2>{t('messagesTitle')}</h2>
       <ul className="list-unstyled m-0">
-        {visible.map((m) => (
-          <Message
-            key={m.id ?? `${m.channelId}-${m.createdAt}-${m.username ?? 'anon'}-${m.body}`}
-            message={m}
-          />
+        {filteredMessages.map((msg) => (
+          <li key={msg.id ?? `${msg.channelId}-${msg.createdAt}-${msg.username ?? 'anon'}-${msg.body}`}>
+            <strong>{msg.username || 'anon'}:</strong> {msg.body}
+          </li>
         ))}
       </ul>
     </div>

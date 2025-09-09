@@ -23,32 +23,29 @@ const ChannelsBox = () => {
       </div>
 
       <ul className="list-unstyled m-0 p-0">
-        {channels.map((ch) => {
-          const active = ch.id === currentChannelId;
-          return (
-            <li key={ch.id} style={{ margin: '5px 0' }}>
-              <button
-                type="button"
-                onClick={() => handleSelectChannel(ch.id)}
-                className={`btn ${active ? 'btn-primary' : 'btn-outline-primary'} w-100 text-start`}
-                // 👇 TEXTO VISIBLE EXACTO. Nada de "# " ni uppercases.
-              >
-                {ch.name}
-              </button>
+        {channels.map((ch) => (
+          <li key={ch.id} style={{ margin: '5px 0' }}>
+            <button
+              type="button"
+              onClick={() => handleSelectChannel(ch.id)}
+              className={`btn ${ch.id === currentChannelId ? 'btn-primary' : 'btn-outline-primary'} w-100 text-start`}
+              // 👇 TEXTO VISIBLE EXACTO. SIN "# ".
+            >
+              {ch.name}
+            </button>
 
-              {ch.removable && (
-                <span style={{ marginLeft: '10px' }}>
-                  <button type="button" onClick={() => handleRemoveChannel(ch.id)}>
-                    {t('modal.remove')}
-                  </button>
-                  <button type="button" onClick={() => handleRenameChannel(ch.id)}>
-                    {t('modal.rename')}
-                  </button>
-                </span>
-              )}
-            </li>
-          );
-        })}
+            {ch.removable && (
+              <span style={{ marginLeft: '10px' }}>
+                <button type="button" onClick={() => handleRemoveChannel(ch.id)}>
+                  {t('modal.remove')}
+                </button>
+                <button type="button" onClick={() => handleRenameChannel(ch.id)}>
+                  {t('modal.rename')}
+                </button>
+              </span>
+            )}
+          </li>
+        ))}
       </ul>
     </div>
   );
