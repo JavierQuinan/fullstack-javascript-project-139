@@ -12,11 +12,11 @@ const initialState = {
   currentChannelId: null,
 };
 
-// ---------- Helpers de normalización ----------
+// ---------- Normalizadores a prueba de backend caprichoso ----------
 const normChannel = (p) => {
   if (!p) return null;
 
-  // JSON:API-like: { data: { id, attributes: { name, removable } } }
+  // { data: { id, attributes: { name, removable } } }
   if (p.data && p.data.id && p.data.attributes) {
     const { id } = p.data;
     const { name, removable } = p.data.attributes;
@@ -75,10 +75,10 @@ const channelsSlice = createSlice({
   name: 'channels',
   initialState,
   reducers: {
-    // setea todos los canales (bootstrap/tests)
+    // Por si necesitas seteo masivo desde componentes/tests
     setChannels: (oldState, action) => ({
       ...oldState,
-      items: action.payload, // array de canales ya normalizados
+      items: action.payload,
     }),
 
     setCurrentChannelId: (oldState, action) => ({
@@ -86,13 +86,13 @@ const channelsSlice = createSlice({
       currentChannelId: action.payload,
     }),
 
-    // Eventos Socket
+    // Eventos de socket
     channelAdded: (oldState, action) => {
       const ch = normChannel(action.payload);
       if (!ch) return oldState;
       const exists = oldState.items.some((c) => c.id === ch.id);
       const items = exists ? oldState.items : [...oldState.items, ch];
-      return { ...oldState, items, currentChannelId: ch.id };
+      return { ...oldState, items, currentChannelId: ch.id }; // foco en el nuevo
     },
 
     channelRemoved: (oldState, action) => {
@@ -105,6 +105,7 @@ const channelsSlice = createSlice({
         const general = filtered.find((c) => c.name === 'general');
         nextId = general ? general.id : (filtered[0]?.id ?? null);
       }
+
       return { ...oldState, items: filtered, currentChannelId: nextId };
     },
 
@@ -124,8 +125,8 @@ const channelsSlice = createSlice({
         if (currentChannelId) {
           newState.currentChannelId = currentChannelId;
         } else {
-          const generalChannel = channels.find((ch) => ch.name === 'general');
-          if (generalChannel) newState.currentChannelId = generalChannel.id;
+          const general = channels.find((ch) => ch.name === 'general');
+          if (general) newState.currentChannelId = general.id;
         }
         return newState;
       })
@@ -145,8 +146,8 @@ const channelsSlice = createSlice({
 
         let nextId = oldState.currentChannelId;
         if (oldState.currentChannelId === removedId) {
-          const generalChannel = filtered.find((ch) => ch.name === 'general');
-          nextId = generalChannel ? generalChannel.id : null;
+          const general = filtered.find((ch) => ch.name === 'general');
+          nextId = general ? general.id : null;
         }
 
         return { ...oldState, items: filtered, currentChannelId: nextId };
