@@ -6,8 +6,11 @@ import { useAuth } from '../../contexts/AuthProvider.jsx';
 import { fetchInitialData } from '../../slices/thunks.js';
 import { useSocket } from '../../contexts/SocketProvider.jsx';
 import { messageReceived } from '../../slices/messagesSlice.js';
-import { channelAdded, channelRemoved, channelRenamed } from '../../slices/channelsSlice.js';
-
+import {
+  channelAdded,
+  channelRemoved,
+  channelRenamed,
+} from '../../slices/channelsSlice.js';
 import ChannelsBox from './Channels/ChannelsBox.jsx';
 import MessagesBox from './Messages/MessagesBox.jsx';
 import MessageForm from './Messages/MessageForm.jsx';
@@ -22,7 +25,7 @@ const ChatPage = () => {
   const dispatch = useDispatch();
   const socket = useSocket();
 
-  // Auth + bootstrap
+  // Redirección + carga inicial
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -31,25 +34,25 @@ const ChatPage = () => {
     }
   }, [isAuthenticated, navigate, dispatch]);
 
-  // Socket events
+  // Suscripciones de socket -> store
   useEffect(() => {
     if (!socket) return undefined;
 
-    const handleNewMessage = (payload) => dispatch(messageReceived(payload));
-    const handleNewChannel = (payload) => dispatch(channelAdded(payload));
-    const handleRemoveChannel = (payload) => dispatch(channelRemoved(payload));
-    const handleRenameChannel = (payload) => dispatch(channelRenamed(payload));
+    const onNewMessage = (payload) => dispatch(messageReceived(payload));
+    const onNewChannel = (payload) => dispatch(channelAdded(payload));
+    const onRemoveChannel = (payload) => dispatch(channelRemoved(payload));
+    const onRenameChannel = (payload) => dispatch(channelRenamed(payload));
 
-    socket.on('newMessage', handleNewMessage);
-    socket.on('newChannel', handleNewChannel);
-    socket.on('removeChannel', handleRemoveChannel);
-    socket.on('renameChannel', handleRenameChannel);
+    socket.on('newMessage', onNewMessage);
+    socket.on('newChannel', onNewChannel);
+    socket.on('removeChannel', onRemoveChannel);
+    socket.on('renameChannel', onRenameChannel);
 
     return () => {
-      socket.off('newMessage', handleNewMessage);
-      socket.off('newChannel', handleNewChannel);
-      socket.off('removeChannel', handleRemoveChannel);
-      socket.off('renameChannel', handleRenameChannel);
+      socket.off('newMessage', onNewMessage);
+      socket.off('newChannel', onNewChannel);
+      socket.off('removeChannel', onRemoveChannel);
+      socket.off('renameChannel', onRenameChannel);
     };
   }, [socket, dispatch]);
 

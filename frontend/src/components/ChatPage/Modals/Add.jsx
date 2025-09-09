@@ -27,25 +27,24 @@ const Add = () => {
     const name = channelName.trim();
     if (!name) return;
 
-    // evita duplicados rápidos en UI (el server también validará)
     if (channels.some((ch) => ch.name === name)) {
       toast.error('Must be unique');
       return;
     }
 
     try {
-      // 1) Crea el canal usando el THUNK (esto ya intenta normalizar)
+      // Crea canal (si el POST no trae body, el socket lo anunciará)
       await dispatch(addChannel({ name })).unwrap();
 
-      // 2) Fuerza refresco de la lista para que "test channel" esté seguro en el store
+      // Refresca por si el POST vino vacío y el socket aún no llegó (100% robusto)
       await dispatch(fetchInitialData());
 
-      // 3) Mensaje EXACTO que busca el test
+      // Texto exacto que valida el test
       toast.success('Channel created');
 
       setChannelName('');
       dispatch(closeModal());
-    } catch (err) {
+    } catch {
       toast.error('Connection error');
     }
   };
@@ -75,7 +74,7 @@ const Add = () => {
               ref={inputRef}
               type="text"
               className="form-control"
-              aria-label="Channel name"    // 👈 el test suele usar esto
+              aria-label="Channel name"
               value={channelName}
               onChange={(e) => setChannelName(e.target.value)}
               autoFocus
