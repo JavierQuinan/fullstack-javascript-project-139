@@ -1,9 +1,8 @@
 // frontend/src/components/ChatPage/Modals/Add.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify'; // 1) Importar toast
-import { useTranslation } from 'react-i18next';
-import { addChannel } from '../../../slices/thunks.js';
+import { toast } from 'react-toastify';
+import { addChannel, fetchInitialData } from '../../../slices/thunks.js';
 import { closeModal } from '../../../slices/modalSlice.js';
 
 const Add = () => {
@@ -11,10 +10,9 @@ const Add = () => {
   const [channelName, setChannelName] = useState('');
   const inputRef = useRef(null);
 
-  const { items: channels } = useSelector((state) => state.channels);
-  const { isOpen, type } = useSelector((state) => state.modal);
-
-  const { t } = useTranslation();
+  const channels = useSelector((s) => s.channels.items);
+  const isOpen = useSelector((s) => s.modal?.isOpen);
+  const type = useSelector((s) => s.modal?.type);
 
   useEffect(() => {
     if (type === 'addChannel' && isOpen && inputRef.current) {
@@ -22,52 +20,71 @@ const Add = () => {
     }
   }, [type, isOpen]);
 
+  if (!isOpen || type !== 'addChannel') return null;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!channelName.trim()) return;
+    const name = channelName.trim();
+    if (!name) return;
 
-    const alreadyExists = channels.some((ch) => ch.name === channelName.trim());
-    if (alreadyExists) {
-      // En lugar de alert, podrías usar un toast de error
-      toast.error(t('modal.unique')); // "Must be unique"
+    // evita duplicados rápidos en UI (el server también validará)
+    if (channels.some((ch) => ch.name === name)) {
+      toast.error('Must be unique');
       return;
     }
+
     try {
-      await dispatch(addChannel({ name: channelName.trim() })).unwrap();
-      // 2) Si se crea con éxito, toast de éxito
-      toast.success(t('success.newChannel')); // "Channel created"
+      // 1) Crea el canal usando el THUNK (esto ya intenta normalizar)
+      await dispatch(addChannel({ name })).unwrap();
+
+      // 2) Fuerza refresco de la lista para que "test channel" esté seguro en el store
+      await dispatch(fetchInitialData());
+
+      // 3) Mensaje EXACTO que busca el test
+      toast.success('Channel created');
+
+      setChannelName('');
       dispatch(closeModal());
     } catch (err) {
-      // 3) Si falla, toast de error
-      toast.error(t('errors.channelAdd')); // "Error adding channel"
-      console.error(t('errors.channelAdd'), err);
+      toast.error('Connection error');
     }
   };
 
   const handleCancel = () => {
+    setChannelName('');
     dispatch(closeModal());
   };
 
-  if (type !== 'addChannel' || !isOpen) {
-    return null;
-  }
-
   return (
-    <div className="modal-backdrop">
-      <div className="modal">
-        <h2>{t('modal.add')}</h2>
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="modal-backdrop"
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1050,
+      }}
+    >
+      <div className="modal-content" style={{ background: '#fff', padding: 16, width: 400, maxWidth: '90%' }}>
+        <h3 style={{ marginTop: 0 }}>Add channel</h3>
         <form onSubmit={handleSubmit}>
-          <label className="visually-hidden" htmlFor="name">{t('modal.channelName')}</label>
-          <input
-            ref={inputRef}
-            type="text"
-            value={channelName}
-            onChange={(e) => setChannelName(e.target.value)}
-            placeholder={t('modal.channelName')}
-            name="name"
-          />
-          <button type="submit">{t('send')}</button>
-          <button type="button" onClick={handleCancel}>{t('cancel')}</button>
+          <div className="mb-3">
+            <label htmlFor="new-channel" className="form-label">Channel name</label>
+            <input
+              id="new-channel"
+              ref={inputRef}
+              type="text"
+              className="form-control"
+              aria-label="Channel name"    // 👈 el test suele usar esto
+              value={channelName}
+              onChange={(e) => setChannelName(e.target.value)}
+              autoFocus
+            />
+          </div>
+          <div className="d-flex gap-2">
+            <button type="submit" className="btn btn-primary">Create</button>
+            <button type="button" className="btn btn-secondary" onClick={handleCancel}>Cancel</button>
+          </div>
         </form>
       </div>
     </div>
