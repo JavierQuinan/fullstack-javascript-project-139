@@ -12,14 +12,73 @@ const initialState = {
   currentChannelId: null,
 };
 
+// ---------- Helpers de normalización ----------
+const normChannel = (p) => {
+  if (!p) return null;
+
+  // JSON:API-like: { data: { id, attributes: { name, removable } } }
+  if (p.data && p.data.id && p.data.attributes) {
+    const { id } = p.data;
+    const { name, removable } = p.data.attributes;
+    return { id, name, removable };
+  }
+
+  // { data: { id, name, removable } }
+  if (p.data && p.data.id && p.data.name) {
+    const { id, name, removable } = p.data;
+    return { id, name, removable };
+  }
+
+  // { id, attributes: { name, removable } }
+  if (p.id && p.attributes) {
+    const { id } = p;
+    const { name, removable } = p.attributes;
+    return { id, name, removable };
+  }
+
+  // Plano: { id, name, removable }
+  if (p.id && p.name) {
+    const { id, name, removable } = p;
+    return { id, name, removable };
+  }
+
+  return null;
+};
+
+const normId = (p) => {
+  if (!p) return null;
+  if (typeof p === 'string' || typeof p === 'number') return p;
+  if (p.data && p.data.id) return p.data.id;
+  if (p.id) return p.id;
+  return null;
+};
+
+const normRename = (p) => {
+  if (!p) return { id: null, name: null };
+  if (p.data && p.data.id && p.data.attributes && p.data.attributes.name) {
+    return { id: p.data.id, name: p.data.attributes.name };
+  }
+  if (p.data && p.data.id && p.data.name) {
+    return { id: p.data.id, name: p.data.name };
+  }
+  if (p.id && p.attributes && p.attributes.name) {
+    return { id: p.id, name: p.attributes.name };
+  }
+  if (p.id && p.name) {
+    return { id: p.id, name: p.name };
+  }
+  return { id: null, name: null };
+};
+
+// ---------- Slice ----------
 const channelsSlice = createSlice({
   name: 'channels',
   initialState,
   reducers: {
-    // ✔️ setea todos los canales (bootstrap/tests)
+    // setea todos los canales (bootstrap/tests)
     setChannels: (oldState, action) => ({
       ...oldState,
-      items: action.payload, // array de canales
+      items: action.payload, // array de canales ya normalizados
     }),
 
     setCurrentChannelId: (oldState, action) => ({
@@ -27,21 +86,18 @@ const channelsSlice = createSlice({
       currentChannelId: action.payload,
     }),
 
-    // ✅ NUEVOS: para eventos de socket en tiempo real
+    // Eventos Socket
     channelAdded: (oldState, action) => {
-      const ch = action.payload; // { id, name, removable? }
+      const ch = normChannel(action.payload);
+      if (!ch) return oldState;
       const exists = oldState.items.some((c) => c.id === ch.id);
       const items = exists ? oldState.items : [...oldState.items, ch];
-      return {
-        ...oldState,
-        items,
-        // foco en el canal recién creado (lo que espera el flujo)
-        currentChannelId: ch.id,
-      };
+      return { ...oldState, items, currentChannelId: ch.id };
     },
 
     channelRemoved: (oldState, action) => {
-      const removedId = action.payload; // id
+      const removedId = normId(action.payload);
+      if (removedId == null) return oldState;
       const filtered = oldState.items.filter((c) => c.id !== removedId);
 
       let nextId = oldState.currentChannelId;
@@ -49,16 +105,12 @@ const channelsSlice = createSlice({
         const general = filtered.find((c) => c.name === 'general');
         nextId = general ? general.id : (filtered[0]?.id ?? null);
       }
-
-      return {
-        ...oldState,
-        items: filtered,
-        currentChannelId: nextId,
-      };
+      return { ...oldState, items: filtered, currentChannelId: nextId };
     },
 
     channelRenamed: (oldState, action) => {
-      const { id, name } = action.payload;
+      const { id, name } = normRename(action.payload);
+      if (id == null || !name) return oldState;
       const items = oldState.items.map((c) => (c.id === id ? { ...c, name } : c));
       return { ...oldState, items };
     },
@@ -67,68 +119,44 @@ const channelsSlice = createSlice({
     builder
       .addCase(fetchInitialData.fulfilled, (oldState, action) => {
         const { channels, currentChannelId } = action.payload;
-        const newState = {
-          ...oldState,
-          items: channels,
-        };
+        const newState = { ...oldState, items: channels };
 
         if (currentChannelId) {
           newState.currentChannelId = currentChannelId;
         } else {
           const generalChannel = channels.find((ch) => ch.name === 'general');
-          if (generalChannel) {
-            newState.currentChannelId = generalChannel.id;
-          }
+          if (generalChannel) newState.currentChannelId = generalChannel.id;
         }
         return newState;
       })
 
       .addCase(addChannel.fulfilled, (oldState, action) => {
-        const newChannel = action.payload; // { id, name, ... }
-        if (!newChannel || !newChannel.id) return oldState;
-
-        const exists = oldState.items.some((c) => c.id === newChannel.id);
-        const items = exists ? oldState.items : [...oldState.items, newChannel];
-
-        return {
-          ...oldState,
-          items,
-          currentChannelId: newChannel.id,
-        };
+        const ch = normChannel(action.payload);
+        if (!ch) return oldState;
+        const exists = oldState.items.some((c) => c.id === ch.id);
+        const items = exists ? oldState.items : [...oldState.items, ch];
+        return { ...oldState, items, currentChannelId: ch.id };
       })
 
       .addCase(removeChannel.fulfilled, (oldState, action) => {
-        const { id: removedId } = action.payload;
+        const removedId = normId(action.payload);
+        if (removedId == null) return oldState;
         const filtered = oldState.items.filter((ch) => ch.id !== removedId);
 
-        let newCurrentChannelId = oldState.currentChannelId;
+        let nextId = oldState.currentChannelId;
         if (oldState.currentChannelId === removedId) {
           const generalChannel = filtered.find((ch) => ch.name === 'general');
-          newCurrentChannelId = generalChannel ? generalChannel.id : null;
+          nextId = generalChannel ? generalChannel.id : null;
         }
 
-        return {
-          ...oldState,
-          items: filtered,
-          currentChannelId: newCurrentChannelId,
-        };
+        return { ...oldState, items: filtered, currentChannelId: nextId };
       })
 
       .addCase(renameChannel.fulfilled, (oldState, action) => {
-        const updated = action.payload; // { id, name, ... }
-        const channelIndex = oldState.items.findIndex((ch) => ch.id === updated.id);
-        if (channelIndex === -1) return oldState;
-
-        const newItems = [...oldState.items];
-        newItems[channelIndex] = {
-          ...newItems[channelIndex],
-          name: updated.name,
-        };
-
-        return {
-          ...oldState,
-          items: newItems,
-        };
+        const { id, name } = normRename(action.payload);
+        if (id == null || !name) return oldState;
+        const items = oldState.items.map((c) => (c.id === id ? { ...c, name } : c));
+        return { ...oldState, items };
       });
   },
 });
@@ -141,7 +169,6 @@ export const {
   channelRenamed,
 } = channelsSlice.actions;
 
-// (opcional)
 export const selectCurrentChannelId = (state) => state.channels.currentChannelId;
 
 export default channelsSlice.reducer;

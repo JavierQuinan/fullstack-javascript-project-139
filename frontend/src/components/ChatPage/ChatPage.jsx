@@ -1,4 +1,3 @@
-// frontend/src/components/ChatPage/ChatPage.jsx
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -22,7 +21,7 @@ const ChatPage = () => {
   const dispatch = useDispatch();
   const socket = useSocket();
 
-  // Verificación de autenticación y bootstrap
+  // Auth + bootstrap
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -31,30 +30,14 @@ const ChatPage = () => {
     }
   }, [isAuthenticated, navigate, dispatch]);
 
-  // Manejo de socket
+  // Socket events
   useEffect(() => {
     if (!socket) return undefined;
 
-    // Mensajes
-    const handleNewMessage = (payload) => {
-      dispatch(messageReceived(payload));
-    };
-
-    // Canales
-    const handleNewChannel = (payload) => {
-      // payload: { id, name, removable? }
-      dispatch(channelAdded(payload));
-    };
-
-    const handleRemoveChannel = (payload) => {
-      // payload: { id }
-      dispatch(channelRemoved(payload.id));
-    };
-
-    const handleRenameChannel = (payload) => {
-      // payload: { id, name }
-      dispatch(channelRenamed(payload));
-    };
+    const handleNewMessage = (payload) => dispatch(messageReceived(payload));
+    const handleNewChannel = (payload) => dispatch(channelAdded(payload));
+    const handleRemoveChannel = (payload) => dispatch(channelRemoved(payload));
+    const handleRenameChannel = (payload) => dispatch(channelRenamed(payload));
 
     socket.on('newMessage', handleNewMessage);
     socket.on('newChannel', handleNewChannel);
