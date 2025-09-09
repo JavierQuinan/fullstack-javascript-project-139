@@ -16,7 +16,7 @@ const App = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) return; // <- clave: como invitado NO llamamos /data
+    if (!token) return; // Invitado: NO llames /data (evita colgar CI)
 
     (async () => {
       try {
