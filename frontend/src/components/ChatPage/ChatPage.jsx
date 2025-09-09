@@ -1,3 +1,4 @@
+// frontend/src/components/ChatPage/ChatPage.jsx
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -5,6 +6,8 @@ import { useAuth } from '../../contexts/AuthProvider.jsx';
 import { fetchInitialData } from '../../slices/thunks.js';
 import { useSocket } from '../../contexts/SocketProvider.jsx';
 import { messageReceived } from '../../slices/messagesSlice.js';
+import { channelAdded, channelRemoved, channelRenamed } from '../../slices/channelsSlice.js';
+
 import ChannelsBox from './Channels/ChannelsBox.jsx';
 import MessagesBox from './Messages/MessagesBox.jsx';
 import MessageForm from './Messages/MessageForm.jsx';
@@ -19,7 +22,7 @@ const ChatPage = () => {
   const dispatch = useDispatch();
   const socket = useSocket();
 
-  // Verificación de autenticación
+  // Verificación de autenticación y bootstrap
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -30,23 +33,27 @@ const ChatPage = () => {
 
   // Manejo de socket
   useEffect(() => {
-    if (!socket) {
-      // Retorna algo (aunque sea 'undefined') para evitar inconsistencia
-      return undefined;
-    }
+    if (!socket) return undefined;
 
+    // Mensajes
     const handleNewMessage = (payload) => {
       dispatch(messageReceived(payload));
     };
 
+    // Canales
     const handleNewChannel = (payload) => {
-      console.log('Recibido evento newChannel:', payload);
+      // payload: { id, name, removable? }
+      dispatch(channelAdded(payload));
     };
+
     const handleRemoveChannel = (payload) => {
-      console.log('Recibido evento removeChannel:', payload);
+      // payload: { id }
+      dispatch(channelRemoved(payload.id));
     };
+
     const handleRenameChannel = (payload) => {
-      console.log('Recibido evento renameChannel:', payload);
+      // payload: { id, name }
+      dispatch(channelRenamed(payload));
     };
 
     socket.on('newMessage', handleNewMessage);
@@ -54,7 +61,6 @@ const ChatPage = () => {
     socket.on('removeChannel', handleRemoveChannel);
     socket.on('renameChannel', handleRenameChannel);
 
-    // Retornamos la limpieza
     return () => {
       socket.off('newMessage', handleNewMessage);
       socket.off('newChannel', handleNewChannel);

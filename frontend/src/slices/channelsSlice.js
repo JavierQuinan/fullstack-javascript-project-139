@@ -16,7 +16,7 @@ const channelsSlice = createSlice({
   name: 'channels',
   initialState,
   reducers: {
-    // ✔️ NUEVO: para setear todos los canales de golpe (bootstrap, tests, etc.)
+    // ✔️ setea todos los canales (bootstrap/tests)
     setChannels: (oldState, action) => ({
       ...oldState,
       items: action.payload, // array de canales
@@ -26,6 +26,42 @@ const channelsSlice = createSlice({
       ...oldState,
       currentChannelId: action.payload,
     }),
+
+    // ✅ NUEVOS: para eventos de socket en tiempo real
+    channelAdded: (oldState, action) => {
+      const ch = action.payload; // { id, name, removable? }
+      const exists = oldState.items.some((c) => c.id === ch.id);
+      const items = exists ? oldState.items : [...oldState.items, ch];
+      return {
+        ...oldState,
+        items,
+        // foco en el canal recién creado (lo que espera el flujo)
+        currentChannelId: ch.id,
+      };
+    },
+
+    channelRemoved: (oldState, action) => {
+      const removedId = action.payload; // id
+      const filtered = oldState.items.filter((c) => c.id !== removedId);
+
+      let nextId = oldState.currentChannelId;
+      if (oldState.currentChannelId === removedId) {
+        const general = filtered.find((c) => c.name === 'general');
+        nextId = general ? general.id : (filtered[0]?.id ?? null);
+      }
+
+      return {
+        ...oldState,
+        items: filtered,
+        currentChannelId: nextId,
+      };
+    },
+
+    channelRenamed: (oldState, action) => {
+      const { id, name } = action.payload;
+      const items = oldState.items.map((c) => (c.id === id ? { ...c, name } : c));
+      return { ...oldState, items };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -48,10 +84,15 @@ const channelsSlice = createSlice({
       })
 
       .addCase(addChannel.fulfilled, (oldState, action) => {
-        const newChannel = action.payload;
+        const newChannel = action.payload; // { id, name, ... }
+        if (!newChannel || !newChannel.id) return oldState;
+
+        const exists = oldState.items.some((c) => c.id === newChannel.id);
+        const items = exists ? oldState.items : [...oldState.items, newChannel];
+
         return {
           ...oldState,
-          items: [...oldState.items, newChannel],
+          items,
           currentChannelId: newChannel.id,
         };
       })
@@ -92,9 +133,15 @@ const channelsSlice = createSlice({
   },
 });
 
-export const { setChannels, setCurrentChannelId } = channelsSlice.actions;
+export const {
+  setChannels,
+  setCurrentChannelId,
+  channelAdded,
+  channelRemoved,
+  channelRenamed,
+} = channelsSlice.actions;
 
-// (opcional, por si lo usas en componentes)
+// (opcional)
 export const selectCurrentChannelId = (state) => state.channels.currentChannelId;
 
 export default channelsSlice.reducer;
