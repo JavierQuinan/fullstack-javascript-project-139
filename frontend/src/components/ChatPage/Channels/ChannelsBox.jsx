@@ -1,4 +1,3 @@
-// frontend/src/components/ChatPage/Channels/ChannelsBox.jsx
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -11,21 +10,10 @@ const ChannelsBox = () => {
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
   const { t } = useTranslation();
 
-  const handleAddChannel = () => {
-    dispatch(openModal({ type: 'addChannel' }));
-  };
-
-  const handleSelectChannel = (id) => {
-    dispatch(setCurrentChannelId(id));
-  };
-
-  const handleRemoveChannel = (id) => {
-    dispatch(openModal({ type: 'removeChannel', channelId: id }));
-  };
-
-  const handleRenameChannel = (id) => {
-    dispatch(openModal({ type: 'renameChannel', channelId: id }));
-  };
+  const handleAddChannel = () => dispatch(openModal({ type: 'addChannel' }));
+  const handleSelectChannel = (id) => dispatch(setCurrentChannelId(id));
+  const handleRemoveChannel = (id) => dispatch(openModal({ type: 'removeChannel', channelId: id }));
+  const handleRenameChannel = (id) => dispatch(openModal({ type: 'renameChannel', channelId: id }));
 
   return (
     <div>
@@ -43,7 +31,7 @@ const ChannelsBox = () => {
                 type="button"
                 onClick={() => handleSelectChannel(ch.id)}
                 className={`btn ${active ? 'btn-primary' : 'btn-outline-primary'} w-100 text-start`}
-                // Importante: texto visible EXACTO del canal (sin prefijos) para que 'text=random' lo encuentre
+                // 👇 TEXTO VISIBLE EXACTO. Nada de "# " ni uppercases.
               >
                 {ch.name}
               </button>
