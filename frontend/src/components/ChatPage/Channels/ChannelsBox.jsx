@@ -21,16 +21,17 @@ const ChannelsBox = () => {
         <button type="button" onClick={handleAddChannel} aria-label="Add channel">+</button>
       </div>
 
-      <ul>
+      {/* 👇 sin bullets */}
+      <ul className="channels-list">
         {channels.map((ch) => (
           <li key={ch.id} style={{ margin: '5px 0' }}>
             <button
               type="button"
+              className={`channel-button${ch.id === currentChannelId ? ' is-active' : ''}`}
               onClick={() => handleSelectChannel(ch.id)}
               aria-label={`channel ${ch.name}`}
-              style={{ fontWeight: ch.id === currentChannelId ? 'bold' : 'normal' }}
             >
-              {ch.name} {/* 👈 sin “# ” */}
+              <span className="channel-name">{ch.name}</span>
             </button>
 
             {ch.removable && (

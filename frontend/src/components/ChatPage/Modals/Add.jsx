@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { addChannel, fetchInitialData } from '../../../slices/thunks.js';
+import { addChannel } from '../../../slices/thunks.js';
 import { closeModal } from '../../../slices/modalSlice.js';
 
 const Add = () => {
@@ -33,15 +33,8 @@ const Add = () => {
     }
 
     try {
-      // Crea canal (si el POST no trae body, el socket lo anunciará)
       await dispatch(addChannel({ name })).unwrap();
-
-      // Refresca por si el POST vino vacío y el socket aún no llegó (100% robusto)
-      await dispatch(fetchInitialData());
-
-      // Texto exacto que valida el test
-      toast.success('Channel created');
-
+      toast.success('Channel created'); // texto exacto del test
       setChannelName('');
       dispatch(closeModal());
     } catch {

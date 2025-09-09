@@ -36,3 +36,11 @@
     transform: rotate(360deg);
   }
 }
+/* El hash visual (#) pero sin afectar el texto real */
+.channel-button .channel-name::before { content: "# "; opacity: 0.8; }
+.channel-button.is-active { font-weight: bold; }
+
+/* 👇 sin bullets y con espaciado limpio */
+.channels-list { list-style: none; padding-left: 0; margin: 0; }
+.channels-list li { margin: 6px 0; }
+
