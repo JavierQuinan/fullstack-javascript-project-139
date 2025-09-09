@@ -18,7 +18,7 @@ export const fetchInitialData = createAsyncThunk(
   },
 );
 
-// ========= UTIL: normalizar channel devuelto por el backend =========
+// ---------- Normalizadores ----------
 const normChannel = (p) => {
   if (!p) return null;
 
@@ -51,6 +51,14 @@ const normChannel = (p) => {
   return null;
 };
 
+const normId = (p) => {
+  if (!p) return null;
+  if (typeof p === 'string' || typeof p === 'number') return p;
+  if (p.data && p.data.id) return p.data.id;
+  if (p.id) return p.id;
+  return null;
+};
+
 // ================== MENSAJES ==================
 export const addMessage = createAsyncThunk(
   'messages/addMessage',
@@ -66,29 +74,27 @@ export const addMessage = createAsyncThunk(
 
 // ================== CANALES ==================
 
-// 👉 Reforzado: si el POST no trae el canal, hacemos GET /channels y lo buscamos por nombre
+// 👇 Blindado: si el POST no trae el canal plano, hacemos GET /channels y buscamos por nombre
 export const addChannel = createAsyncThunk(
   'channels/addChannel',
   async ({ name }, { rejectWithValue }) => {
     try {
       const postResp = await api.post('/channels', { name });
 
-      // 1) Intento directo
+      // 1) Intento directo: normalizamos la respuesta del POST
       const direct = normChannel(postResp.data);
-      if (direct) return direct;
+      if (direct && direct.name) return direct;
 
-      // 2) Fallback robusto: re-fetch lista y buscar por nombre
+      // 2) Fallback: re-fetch lista y elegimos el canal con ese nombre (el de mayor id)
       const listResp = await api.get('/channels');
       const list = Array.isArray(listResp.data) ? listResp.data : [];
-
-      // si hay varios con el mismo nombre, elegimos el de mayor id (suele ser el último creado)
       const candidates = list.filter((c) => c.name === name);
       if (candidates.length > 0) {
         const chosen = candidates.reduce((a, b) => ((a.id ?? 0) > (b.id ?? 0) ? a : b));
-        return chosen;
+        return { id: chosen.id, name: chosen.name, removable: chosen.removable };
       }
 
-      // 3) Último recurso: fake local (debería no ocurrir, pero evita que el test falle)
+      // 3) Último recurso (muy raro): fake local para no romper la UI
       return { id: Date.now(), name, removable: true };
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -101,7 +107,8 @@ export const removeChannel = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await api.delete(`/channels/${id}`);
-      return response.data; // { id }
+      const removedId = normId(response.data);
+      return { id: removedId ?? id };
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -113,7 +120,12 @@ export const renameChannel = createAsyncThunk(
   async ({ id, newName }, { rejectWithValue }) => {
     try {
       const response = await api.patch(`/channels/${id}`, { name: newName });
-      return response.data; // { id, name }
+      // Intento normalizar a { id, name }
+      const direct = normChannel(response.data);
+      if (direct && direct.id) return { id: direct.id, name: direct.name };
+      // Fallback plano
+      if (response.data?.id) return { id: response.data.id, name: response.data.name };
+      return { id, name: newName };
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }

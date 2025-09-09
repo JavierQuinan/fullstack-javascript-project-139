@@ -12,91 +12,64 @@ const initialState = {
   currentChannelId: null,
 };
 
-// ---------- Normalizadores a prueba de backend caprichoso ----------
+// Normalización mínima por si llegan formas distintas desde socket
 const normChannel = (p) => {
   if (!p) return null;
-
-  // { data: { id, attributes: { name, removable } } }
   if (p.data && p.data.id && p.data.attributes) {
     const { id } = p.data;
     const { name, removable } = p.data.attributes;
     return { id, name, removable };
   }
-
-  // { data: { id, name, removable } }
   if (p.data && p.data.id && p.data.name) {
     const { id, name, removable } = p.data;
     return { id, name, removable };
   }
-
-  // { id, attributes: { name, removable } }
   if (p.id && p.attributes) {
     const { id } = p;
     const { name, removable } = p.attributes;
     return { id, name, removable };
   }
-
-  // Plano: { id, name, removable }
   if (p.id && p.name) {
     const { id, name, removable } = p;
     return { id, name, removable };
   }
-
   return null;
 };
 
-const normId = (p) => {
-  if (!p) return null;
-  if (typeof p === 'string' || typeof p === 'number') return p;
-  if (p.data && p.data.id) return p.data.id;
+const getId = (p) => {
+  if (p == null) return null;
+  if (typeof p === 'number' || typeof p === 'string') return p;
+  if (p.data?.id) return p.data.id;
   if (p.id) return p.id;
   return null;
 };
 
-const normRename = (p) => {
-  if (!p) return { id: null, name: null };
-  if (p.data && p.data.id && p.data.attributes && p.data.attributes.name) {
-    return { id: p.data.id, name: p.data.attributes.name };
-  }
-  if (p.data && p.data.id && p.data.name) {
-    return { id: p.data.id, name: p.data.name };
-  }
-  if (p.id && p.attributes && p.attributes.name) {
-    return { id: p.id, name: p.attributes.name };
-  }
-  if (p.id && p.name) {
-    return { id: p.id, name: p.name };
-  }
-  return { id: null, name: null };
-};
-
-// ---------- Slice ----------
 const channelsSlice = createSlice({
   name: 'channels',
   initialState,
   reducers: {
-    // Por si necesitas seteo masivo desde componentes/tests
-    setChannels: (oldState, action) => ({
-      ...oldState,
-      items: action.payload,
-    }),
-
     setCurrentChannelId: (oldState, action) => ({
       ...oldState,
       currentChannelId: action.payload,
     }),
 
-    // Eventos de socket
+    // Opcional (por si lo usas en bootstrap)
+    setChannels: (oldState, action) => ({
+      ...oldState,
+      items: action.payload,
+    }),
+
+    // === Eventos de socket ===
     channelAdded: (oldState, action) => {
       const ch = normChannel(action.payload);
-      if (!ch) return oldState;
+      if (!ch || !ch.id) return oldState;
       const exists = oldState.items.some((c) => c.id === ch.id);
       const items = exists ? oldState.items : [...oldState.items, ch];
-      return { ...oldState, items, currentChannelId: ch.id }; // foco en el nuevo
+      return { ...oldState, items, currentChannelId: ch.id };
     },
 
     channelRemoved: (oldState, action) => {
-      const removedId = normId(action.payload);
+      const removedId = getId(action.payload);
       if (removedId == null) return oldState;
       const filtered = oldState.items.filter((c) => c.id !== removedId);
 
@@ -110,7 +83,15 @@ const channelsSlice = createSlice({
     },
 
     channelRenamed: (oldState, action) => {
-      const { id, name } = normRename(action.payload);
+      const payload = action.payload || {};
+      const id = getId(payload);
+      const name =
+        payload?.data?.attributes?.name ??
+        payload?.data?.name ??
+        payload?.attributes?.name ??
+        payload?.name ??
+        null;
+
       if (id == null || !name) return oldState;
       const items = oldState.items.map((c) => (c.id === id ? { ...c, name } : c));
       return { ...oldState, items };
@@ -133,28 +114,36 @@ const channelsSlice = createSlice({
 
       .addCase(addChannel.fulfilled, (oldState, action) => {
         const ch = normChannel(action.payload);
-        if (!ch) return oldState;
+        if (!ch || !ch.id) return oldState;
         const exists = oldState.items.some((c) => c.id === ch.id);
         const items = exists ? oldState.items : [...oldState.items, ch];
         return { ...oldState, items, currentChannelId: ch.id };
       })
 
       .addCase(removeChannel.fulfilled, (oldState, action) => {
-        const removedId = normId(action.payload);
+        const removedId = getId(action.payload);
         if (removedId == null) return oldState;
-        const filtered = oldState.items.filter((ch) => ch.id !== removedId);
 
+        const filtered = oldState.items.filter((ch) => ch.id !== removedId);
         let nextId = oldState.currentChannelId;
         if (oldState.currentChannelId === removedId) {
           const general = filtered.find((ch) => ch.name === 'general');
-          nextId = general ? general.id : null;
+          nextId = general ? general.id : (filtered[0]?.id ?? null);
         }
-
         return { ...oldState, items: filtered, currentChannelId: nextId };
       })
 
       .addCase(renameChannel.fulfilled, (oldState, action) => {
-        const { id, name } = normRename(action.payload);
+        const upd = normChannel(action.payload);
+        const id = upd?.id ?? action.payload?.id ?? action.payload?.data?.id ?? null;
+        const name =
+          upd?.name ??
+          action.payload?.data?.attributes?.name ??
+          action.payload?.data?.name ??
+          action.payload?.attributes?.name ??
+          action.payload?.name ??
+          null;
+
         if (id == null || !name) return oldState;
         const items = oldState.items.map((c) => (c.id === id ? { ...c, name } : c));
         return { ...oldState, items };
@@ -163,13 +152,11 @@ const channelsSlice = createSlice({
 });
 
 export const {
-  setChannels,
   setCurrentChannelId,
+  setChannels,
   channelAdded,
   channelRemoved,
   channelRenamed,
 } = channelsSlice.actions;
-
-export const selectCurrentChannelId = (state) => state.channels.currentChannelId;
 
 export default channelsSlice.reducer;
