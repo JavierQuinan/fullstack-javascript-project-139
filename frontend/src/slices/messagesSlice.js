@@ -10,6 +10,12 @@ const messagesSlice = createSlice({
   name: 'messages',
   initialState,
   reducers: {
+    // ✔️ NUEVO: para setear todos los mensajes de golpe (bootstrap, tests, etc.)
+    setMessages: (oldState, action) => ({
+      ...oldState,
+      items: action.payload, // array de mensajes
+    }),
+
     messageReceived: (oldState, action) => ({
       ...oldState,
       items: [...oldState.items, action.payload],
@@ -23,5 +29,6 @@ const messagesSlice = createSlice({
   },
 });
 
-export const { messageReceived } = messagesSlice.actions;
+export const { setMessages, messageReceived } = messagesSlice.actions;
+
 export default messagesSlice.reducer;

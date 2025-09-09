@@ -16,6 +16,12 @@ const channelsSlice = createSlice({
   name: 'channels',
   initialState,
   reducers: {
+    // ✔️ NUEVO: para setear todos los canales de golpe (bootstrap, tests, etc.)
+    setChannels: (oldState, action) => ({
+      ...oldState,
+      items: action.payload, // array de canales
+    }),
+
     setCurrentChannelId: (oldState, action) => ({
       ...oldState,
       currentChannelId: action.payload,
@@ -70,14 +76,14 @@ const channelsSlice = createSlice({
       .addCase(renameChannel.fulfilled, (oldState, action) => {
         const updated = action.payload; // { id, name, ... }
         const channelIndex = oldState.items.findIndex((ch) => ch.id === updated.id);
-        if (channelIndex === -1) {
-          return oldState;
-        }
+        if (channelIndex === -1) return oldState;
+
         const newItems = [...oldState.items];
         newItems[channelIndex] = {
           ...newItems[channelIndex],
           name: updated.name,
         };
+
         return {
           ...oldState,
           items: newItems,
@@ -86,5 +92,9 @@ const channelsSlice = createSlice({
   },
 });
 
-export const { setCurrentChannelId } = channelsSlice.actions;
+export const { setChannels, setCurrentChannelId } = channelsSlice.actions;
+
+// (opcional, por si lo usas en componentes)
+export const selectCurrentChannelId = (state) => state.channels.currentChannelId;
+
 export default channelsSlice.reducer;
