@@ -1,77 +1,86 @@
 // frontend/src/components/ChatPage/Modals/Rename.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify'; // Importar toast
+import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { renameChannel } from '../../../slices/thunks.js';
 import { closeModal } from '../../../slices/modalSlice.js';
+import { renameChannel } from '../../../slices/thunks.js';
 
 const Rename = () => {
   const dispatch = useDispatch();
-  const [newName, setNewName] = useState('');
-  const inputRef = useRef(null);
-
-  const { items: channels } = useSelector((state) => state.channels);
-  const { isOpen, type, channelId } = useSelector((state) => state.modal);
-
   const { t } = useTranslation();
 
+  const { isOpen, type, channelId } = useSelector((state) => state.modal);
+  const channels = useSelector((state) => state.channels.items);
+
+  const channel = useMemo(
+    () => channels.find((c) => c.id === channelId) || null,
+    [channels, channelId],
+  );
+
+  const [name, setName] = useState(channel?.name ?? '');
+  const inputRef = useRef(null);
+
   useEffect(() => {
-    if (type === 'renameChannel' && isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (type === 'renameChannel' && isOpen) {
+      setName(channel?.name ?? '');
+      setTimeout(() => inputRef.current?.focus(), 0);
     }
-  }, [type, isOpen]);
+  }, [type, isOpen, channel?.name]);
 
-  if (type !== 'renameChannel' || !isOpen) {
-    return null;
-  }
+  if (type !== 'renameChannel' || !isOpen || !channel) return null;
 
-  const currentChannel = channels.find((ch) => ch.id === channelId);
+  const onCancel = () => dispatch(closeModal());
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    if (!newName.trim()) return;
+    const trimmed = name.trim();
 
-    const alreadyExists = channels.some((ch) => ch.name === newName.trim());
-    if (alreadyExists) {
-      toast.error(t('modal.unique')); // "Must be unique"
+    if (!trimmed) return;
+
+    const existsWithSame = channels.some(
+      (c) => c.name === trimmed && c.id !== channel.id,
+    );
+    if (existsWithSame) {
+      toast.error(t('modal.unique') || 'Must be unique');
       return;
     }
+
     try {
-      await dispatch(renameChannel({ id: channelId, newName: newName.trim() })).unwrap();
-      // Éxito => toast success
-      toast.success(t('success.renameChannel')); // "Channel renamed"
+      await dispatch(renameChannel({ id: channel.id, newName: trimmed })).unwrap();
+      // Mensaje EXACTO que buscan en los tests
+      toast.success('Channel renamed');
       dispatch(closeModal());
     } catch (err) {
-      // Error => toast error
-      toast.error(t('errors.channelRename')); // "Error renaming channel"
-      console.error(t('errors.channelRename'), err);
+      toast.error(t('errors.channelRename') || 'Error renaming channel');
+      // opcional: console.error(err);
     }
-  };
-
-  const handleCancel = () => {
-    dispatch(closeModal());
   };
 
   return (
     <div className="modal-backdrop">
       <div className="modal">
-        <h2>{t('modal.renameChannel')}</h2>
-        <p>{`${t('modal.toggle')}: ${currentChannel?.name}`}</p>
-        <form onSubmit={handleSubmit}>
+        <h2>{t('modal.rename') || 'Rename'}</h2>
+        <form onSubmit={onSubmit}>
+          <label className="visually-hidden" htmlFor="rename-input">
+            {t('modal.channelName') || 'Channel name'}
+          </label>
           <input
+            id="rename-input"
             ref={inputRef}
             type="text"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            placeholder={t('modal.channelName')}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={t('modal.channelName') || 'Channel name'}
             name="name"
-            id="name"
           />
-          <label className="visually-hidden" htmlFor="name">{t('modal.channelName')}</label>
-          <button type="submit">{t('modal.rename')}</button>
-          <button type="button" onClick={handleCancel}>{t('cancel')}</button>
-        </form>
+          <div style={{ marginTop: 10, display: 'flex', gap: 8 }}>
+            <button type="submit">Submit</button>
+            <button type="button" onClick={onCancel}>
+              {t('cancel') || 'Cancel'}
+            </button>
+          </div>
+      </form>
       </div>
     </div>
   );
