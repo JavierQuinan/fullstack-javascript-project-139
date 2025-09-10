@@ -1,10 +1,18 @@
-.PHONY: install build start
+lint-frontend:
+	make -C frontend lint
 
 install:
-	npm install --prefix ..
+	npm ci
+	cd frontend && npm ci
+
+start-backend:
+	npx start-server -s ./frontend/dist -p 5001
+
+start-frontend:
+	make -C frontend start-frontend
+
+start:
+	make -C frontend start-frontend
 
 build:
-	npm run build --prefix ..
-
-start: build
-	npm start --prefix ..
+	make -C frontend build
