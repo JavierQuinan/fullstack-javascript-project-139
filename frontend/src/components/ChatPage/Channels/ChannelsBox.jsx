@@ -21,23 +21,39 @@ const ChannelsBox = () => {
         <button type="button" onClick={handleAddChannel} aria-label="Add channel">+</button>
       </div>
 
-      {/* 👇 sin bullets */}
-      <ul className="channels-list">
+      {/* sin bullets */}
+      <ul className="channels-list" style={{ listStyle: 'none', paddingLeft: 0, margin: 0 }}>
         {channels.map((ch) => (
-          <li key={ch.id} style={{ margin: '5px 0' }}>
+          <li key={ch.id} style={{ margin: '6px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
               type="button"
-              className={`channel-button${ch.id === currentChannelId ? ' is-active' : ''}`}
               onClick={() => handleSelectChannel(ch.id)}
+              className={`channel-button${ch.id === currentChannelId ? ' is-active' : ''}`}
               aria-label={`channel ${ch.name}`}
             >
               <span className="channel-name">{ch.name}</span>
             </button>
 
             {ch.removable && (
-              <span style={{ marginLeft: 10 }}>
-                <button type="button" onClick={() => handleRemoveChannel(ch.id)}>Remove</button>
-                <button type="button" onClick={() => handleRenameChannel(ch.id)}>Rename</button>
+              <span style={{ display: 'inline-flex', gap: 6 }}>
+                {/* 👇 Hacemos que el test siempre encuentre estos controles */}
+                <button
+                  type="button"
+                  aria-label="Rename"
+                  data-testid="rename"
+                  onClick={() => handleRenameChannel(ch.id)}
+                >
+                  Rename
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Remove"
+                  data-testid="remove"
+                  onClick={() => handleRemoveChannel(ch.id)}
+                >
+                  Remove
+                </button>
               </span>
             )}
           </li>
