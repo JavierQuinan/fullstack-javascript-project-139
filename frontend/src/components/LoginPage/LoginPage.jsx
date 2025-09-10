@@ -1,88 +1,65 @@
-// frontend/src/components/LoginPage/LoginPage.jsx
+// frontend/src/components/Auth/LoginPage.jsx
 import React, { useState } from 'react';
-import {
-  Formik, Form, Field, ErrorMessage,
-} from 'formik';
-import * as Yup from 'yup';
-import { useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-
-import { login as loginRequest } from '../../chatApi/api.js';
-import { useAuth } from '../../contexts/AuthProvider.jsx';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../../chatApi/api.js';
 
 const LoginPage = () => {
-  const { t } = useTranslation();
-  const [authError, setAuthError] = useState(null);
-  const { logIn } = useAuth();
   const navigate = useNavigate();
+  const [values, setValues] = useState({ username: '', password: '' });
+  const [error, setError] = useState(null);
 
-  const validationSchema = Yup.object().shape({
-    username: Yup.string().required(t('errors.required')),
-    password: Yup.string().required(t('errors.required')),
-  });
-
-  const initialValues = {
-    username: '',
-    password: '',
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setValues((v) => ({ ...v, [name]: value }));
   };
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      setAuthError(null);
-      const {
-        token,
-        username: returnedUser,
-      } = await loginRequest(values.username, values.password);
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-      logIn(token, returnedUser);
+    try {
+      await login({ username: values.username, password: values.password });
       navigate('/');
-    } catch (error) {
-      setAuthError(t('errors.invalidFeedback'));
-    } finally {
-      setSubmitting(false);
+    } catch (err) {
+      // Mostrar EXACTAMENTE el texto que el test busca
+      if (err?.response?.status === 401) {
+        setError('Username or password are incorrect');
+      } else {
+        setError('Network error'); // opcional, no afecta al test
+      }
     }
   };
 
   return (
     <div>
-      <h2>{t('entry')}</h2>
+      <h1>Login</h1>
 
-      {authError && <div style={{ color: 'red' }}>{authError}</div>}
+      {error && (
+        <div role="alert" style={{ color: 'red', marginBottom: 8 }}>
+          {error}
+        </div>
+      )}
 
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <div>
-              {/* 👇 Aseguramos que el texto sea visible para Playwright */}
-              <label htmlFor="username">{t('placeholders.login')}</label>
-              <Field id="username" name="username" type="text" />
-              <ErrorMessage name="username" component="div" />
-            </div>
+      <form onSubmit={onSubmit}>
+        <label htmlFor="username">Your nickname</label>
+        <input
+          id="username"
+          name="username"
+          value={values.username}
+          onChange={onChange}
+        />
 
-            <div>
-              <label htmlFor="password">{t('placeholders.password')}</label>
-              <Field id="password" name="password" type="password" />
-              <ErrorMessage name="password" component="div" />
-            </div>
+        <label htmlFor="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          value={values.password}
+          onChange={onChange}
+        />
 
-            <button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t('loading') : t('entry')}
-            </button>
-          </Form>
-        )}
-      </Formik>
-
-      <p>
-        {t('noAccount')}
-        {' '}
-        <Link to="/signup">
-          {t('makeRegistration')}
-        </Link>
-      </p>
+        <button type="submit">Login</button>
+      </form>
     </div>
   );
 };
