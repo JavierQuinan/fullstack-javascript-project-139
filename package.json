@@ -1,0 +1,29 @@
+{
+  "name": "fullstack-javascript-project-139",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JavierQuinan/fullstack-javascript-project-139.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JavierQuinan/fullstack-javascript-project-139/issues"
+  },
+  "homepage": "https://github.com/JavierQuinan/fullstack-javascript-project-139#readme",
+  "keywords": [],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm --prefix frontend run build",
+    "start": "npx start-server ./frontend/build",
+    "start:dev": "npx chat-server --port 5001 --clientDir ./frontend/build"
+  },
+  "dependencies": {
+    "@hexlet/chat-server": "2.0.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
