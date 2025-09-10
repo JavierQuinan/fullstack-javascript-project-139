@@ -2,93 +2,112 @@
 
 [![Actions Status](https://github.com/iPoolito/frontend-project-139/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/iPoolito/frontend-project-139/actions)
 
-### Hexlet tests and linter status:
 
-# ChatAPP
+### Hexlet tests and linter status
 
-Este proyecto es un chat en tiempo real basado en **React** (frontend) y el servidor de **Hexlet** (backend).  
-A continuación se describen los pasos para ejecutarlo localmente (tanto en desarrollo como en producción), y el enlace al despliegue en **Railway**.
+# ChatAPP — Guía de Uso
 
-## Despliegue en Railway
-
-La aplicación está desplegada en [Railway](https://railway.app/).  
-Puedes acceder a la versión en producción aquí:  
-[https://chatapp-production-b85f.up.railway.app/](https://chatapp-production-b85f.up.railway.app/)
+Chat en tiempo real con **React** (frontend) y el servidor de **Hexlet** (backend).
+Este README te deja la app andando **en local** y lista para **deploy** 🤝.
 
 ---
 
-## Uso en local
+## 🔧 Requisitos
+- **Node.js 18.x**
+- **npm** reciente
 
-### 1. Clonar el repositorio
+---
 
+## 📦 Instalación
+
+**Dependencias del root:**
 ```bash
-git clone https://github.com/Shi0-X/ChatAPP.git
-cd ChatAPP
-```
-
-### 2. Instalar dependencias
-
-En la raíz (donde está el package.json principal):
-
-```bash
-Copiar
 npm install
 ```
 
-Luego, en la carpeta frontend/ (donde está el package.json del frontend):
-
+**Dependencias del frontend:**
 ```bash
-Copiar
 cd frontend
 npm install
 cd ..
 ```
 
-### Modo desarrollo (puerto 3000)
+---
 
-Si deseas desarrollar o modificar el código React con recarga en caliente:
+## 💻 Modo desarrollo (hot reload en :3000)
 
-En una terminal, inicia el servidor de desarrollo de Create React App:
-
+**Levanta el dev server de React (CRA):**
 ```bash
 cd frontend
 npm start
-Esto abrirá el frontend en http://localhost:3000.
+# abre http://localhost:3000
 ```
 
-(Opcional) En otra terminal, levanta el servidor de Hexlet para manejar las peticiones reales:
-
+**(Opcional) Backend real de Hexlet en paralelo:**
 ```bash
-Copiar
 npx start-server --port 5001
-Corre en http://localhost:5001.
+# corre en http://localhost:5001
 ```
 
-Tu frontend, corriendo en el puerto 3000, hará peticiones a http://localhost:5001/api/v1/... (ver api.js).
-Si el servidor no está activo, las peticiones (login, canales, etc.) darán errores de red.
+> Con el **proxy** configurado en CRA, las llamadas a `/api/v1/...` se redirigen a `http://localhost:5001`.
 
-### Modo producción (puerto 5001)
+---
 
-Para ejecutar el frontend compilado y el backend en un solo puerto (5001):
+## 🏭 Modo producción local (todo en un puerto :5001)
 
-Compila el frontend:
-
+**Compila el frontend:**
 ```bash
-Copiar
 cd frontend
 npm run build
 cd ..
 ```
 
-Esto genera la carpeta build/ dentro de frontend/.
-
-Inicia el servidor de Hexlet, sirviendo la carpeta estática ./frontend/build:
-
+**Sirve el build con el servidor de Hexlet:**
 ```bash
-Copiar
 npx start-server --port 5001 --static ./frontend/build
-Abre http://localhost:5001 en tu navegador.
+# abre http://localhost:5001
 ```
 
-La aplicación React (modo producción) se servirá en ese puerto.
-Las peticiones de login, canales, etc. se harán al mismo puerto 5001 (/api/v1/...).
+La app React (compilada) **y** la API quedan disponibles en el mismo puerto.
+
+---
+
+## 📁 Estructura mínima del proyecto
+
+```
+.
+├─ frontend/
+│  ├─ public/
+│  ├─ src/
+│  ├─ build/             # se genera al compilar
+│  └─ package.json
+├─ package.json           # configuración raíz
+└─ README.md
+```
+
+---
+
+## 🧪 Checks rápidos (lo que suelen validar las pruebas)
+
+- ✅ El **build** del frontend se genera en `frontend/build`.
+- ✅ El **servidor** sirve correctamente esa carpeta de estáticos.
+- ✅ El **proxy** del CRA apunta al backend (`http://localhost:5001`).
+- ✅ Rutas base visibles: `/login` y dashboard con canales `#general` y `#random`.
+- ✅ En el encabezado existe un enlace **“Hexlet Chat”** que lleva a la **Home**.
+
+---
+
+## 🧯 Problemas frecuentes y cómo resolverlos
+
+- **CORS o 404 en `/api`** → revisa que el **proxy** del CRA esté configurado y que el server corra en `:5001`.
+- **502 en Railway** → valida que el **Start Command** sea `npm start` (o el que uses) y que el **build** exista.
+- **Versión de Node no compatible** → define `"engines": { "node": ">=18" }` en `package.json`.
+
+---
+
+## 🔗 Notas útiles
+
+- Si usas **CI de Hexlet** con `Makefile` o workflows, asegúrate de incluir los archivos que el pipeline espera (por ejemplo, no ignores directorios requeridos en `.dockerignore` / `.gitignore`).
+- Para despliegues automatizados en PaaS (Railway, etc.), puedes configurar un script **`postinstall`** que construya el frontend tras instalar dependencias.
+
+---
