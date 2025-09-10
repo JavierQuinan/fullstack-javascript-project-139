@@ -1,9 +1,9 @@
 .PHONY: install build start
 
 install:
-	# instala deps del paquete raíz (server, scripts, etc.)
+	# instala dependencias del paquete raíz
 	npm install --prefix ..
-	# instala deps del CRA
+	# instala dependencias del frontend
 	npm install --prefix ../frontend
 
 build:
@@ -11,5 +11,5 @@ build:
 	npm run build --prefix ../frontend
 
 start: build
-	# levanta el server sirviendo el build
+	# sirve el build con chat-server
 	npm start --prefix ..
