@@ -8,30 +8,31 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,
 });
 
+// --- Interceptor para añadir token ---
 api.interceptors.request.use(
   (cfg) => {
-    // Creamos una copia para no mutar 'cfg'
-    const newCfg = { ...cfg };
     const token = getToken();
     if (token) {
-      newCfg.headers = {
-        ...newCfg.headers,
-        Authorization: `Bearer ${token}`,
+      return {
+        ...cfg,
+        headers: {
+          ...cfg.headers,
+          Authorization: `Bearer ${token}`,
+        },
       };
     }
-    return newCfg;
+    return cfg;
   },
   (error) => Promise.reject(error),
 );
 
+// --- Interceptor para manejar 401 ---
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Opción #1: Solo redirige a /login si YA había un token (usuario logueado).
       const token = localStorage.getItem('token');
       if (token) {
         localStorage.removeItem('token');
@@ -43,61 +44,53 @@ api.interceptors.response.use(
   },
 );
 
+// ==================== ENDPOINTS ==================== //
 export const getData = async () => {
   const { data } = await api.get('/data');
   return data;
 };
 
-// ----- FUNCIONES DE LOGIN, SIGNUP, GET CHANNELS, GET MESSAGES ----- //
-export const login = async (username, password) => {
+// ----- LOGIN -----
+export const login = async (creds) => {
   try {
-    const response = await api.post('/login', { username, password });
-    console.log('=== Respuesta del servidor al login ===', response.data);
+    // Acepta tanto { username, password } como { nickname, password }
+    const username = creds.username ?? creds.nickname;
+    const { password } = creds;
 
-    const { token, username: returnedUser } = response.data || {};
-    console.log('Desestructurado: token=', token, 'username=', returnedUser);
+    const { data } = await api.post('/login', { username, password });
+    const { token, username: returnedUser } = data || {};
 
     if (token && returnedUser) {
-      console.log('Guardando en localStorage:', token, returnedUser);
       localStorage.setItem('token', token);
       localStorage.setItem('username', returnedUser);
-    } else {
-      console.warn('El servidor no devolvió username o token');
     }
 
-    console.log('✅ Login exitoso:', response.data);
-    return response.data;
+    return data;
   } catch (error) {
     console.error('🚨 Error en login:', error);
     throw error;
   }
 };
 
-export const signup = async (username, password) => {
-  const response = await api.post('/signup', { username, password });
-  return response.data;
+// ----- SIGNUP -----
+export const signup = async (creds) => {
+  const username = creds.username ?? creds.nickname;
+  const { password } = creds;
+
+  const { data } = await api.post('/signup', { username, password });
+  return data;
 };
 
+// ----- CANALES -----
 export const getChannels = async () => {
-  try {
-    const response = await api.get('/channels');
-    console.log('✅ Canales obtenidos:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('🚨 Error al obtener canales:', error);
-    throw error;
-  }
+  const { data } = await api.get('/channels');
+  return data;
 };
 
+// ----- MENSAJES -----
 export const getMessages = async () => {
-  try {
-    const response = await api.get('/messages');
-    console.log('✅ Mensajes obtenidos:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('🚨 Error al obtener mensajes:', error);
-    throw error;
-  }
+  const { data } = await api.get('/messages');
+  return data;
 };
 
 export default api;

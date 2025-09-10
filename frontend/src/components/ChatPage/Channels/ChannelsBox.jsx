@@ -1,17 +1,14 @@
 // frontend/src/components/ChatPage/Channels/ChannelsBox.jsx
 import React, { useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useTranslation } from 'react-i18next';
-import { openModal } from '../../../slices/modalSlice.js';
 import { setCurrentChannelId } from '../../../slices/channelsSlice.js';
+import { openModal } from '../../../slices/modalSlice.js';
 
 const ChannelsBox = () => {
   const dispatch = useDispatch();
   const channels = useSelector((state) => state.channels.items);
   const currentChannelId = useSelector((state) => state.channels.currentChannelId);
-  const { t } = useTranslation();
 
-  // id del canal cuyo menú está abierto (o null)
   const [openMenuId, setOpenMenuId] = useState(null);
 
   const handleAddChannel = () => {
@@ -23,13 +20,14 @@ const ChannelsBox = () => {
     setOpenMenuId(null);
   };
 
-  const handleRemoveChannel = useCallback((id) => {
-    dispatch(openModal({ type: 'removeChannel', channelId: id }));
+  const handleRemoveChannel = useCallback((ch) => {
+    // Pasa id (y name opcionalmente) — el slice puede ignorar extras.
+    dispatch(openModal({ type: 'removeChannel', channelId: ch.id, name: ch.name }));
     setOpenMenuId(null);
   }, [dispatch]);
 
-  const handleRenameChannel = useCallback((id) => {
-    dispatch(openModal({ type: 'renameChannel', channelId: id }));
+  const handleRenameChannel = useCallback((ch) => {
+    dispatch(openModal({ type: 'renameChannel', channelId: ch.id, name: ch.name }));
     setOpenMenuId(null);
   }, [dispatch]);
 
@@ -37,25 +35,11 @@ const ChannelsBox = () => {
     setOpenMenuId((prev) => (prev === id ? null : id));
   };
 
-  // Cerrar menú si se hace click fuera (opcional pero ayuda en UX)
-  React.useEffect(() => {
-    const onDocClick = (e) => {
-      // Cierra si hace click en algo que no sea nuestro menu button/list
-      if (!e.target.closest?.('[data-channel-actions]')) {
-        setOpenMenuId(null);
-      }
-    };
-    document.addEventListener('click', onDocClick);
-    return () => document.removeEventListener('click', onDocClick);
-  }, []);
-
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>{t('channelsTitle')}</h2>
-        <button type="button" onClick={handleAddChannel}>
-          +
-        </button>
+        <h2>Channels</h2>
+        <button type="button" onClick={handleAddChannel}>+</button>
       </div>
 
       <ul>
@@ -70,27 +54,22 @@ const ChannelsBox = () => {
             </button>
 
             {ch.removable && (
-              <span
-                data-channel-actions
-                style={{ position: 'relative', display: 'inline-block' }}
-              >
-                {/* Botón de gestión: el nombre accesible proviene del contenido (incluye texto oculto) */}
+              <span style={{ position: 'relative', display: 'inline-block' }}>
+                {/* Botón de gestión CON nombre accesible EXACTO */}
                 <button
                   type="button"
                   aria-haspopup="menu"
                   aria-expanded={openMenuId === ch.id}
+                  aria-label="Channel management"
                   onClick={() => toggleMenu(ch.id)}
                 >
-                  {/* Ícono simple */}
                   ⋮
-                  {/* Texto accesible que el test puede encontrar por nombre */}
-                  <span className="visually-hidden">{t('modal.menu')}</span>
                 </button>
 
                 {openMenuId === ch.id && (
                   <ul
                     role="menu"
-                    aria-label={t('modal.menu')}
+                    aria-label="Channel management"
                     style={{
                       position: 'absolute',
                       top: '100%',
@@ -108,20 +87,20 @@ const ChannelsBox = () => {
                       <button
                         type="button"
                         role="menuitem"
-                        onClick={() => handleRenameChannel(ch.id)}
+                        onClick={() => handleRenameChannel(ch)}
                         style={{ display: 'block', width: '100%', textAlign: 'left' }}
                       >
-                        {t('modal.rename')}
+                        Rename
                       </button>
                     </li>
                     <li>
                       <button
                         type="button"
                         role="menuitem"
-                        onClick={() => handleRemoveChannel(ch.id)}
+                        onClick={() => handleRemoveChannel(ch)}
                         style={{ display: 'block', width: '100%', textAlign: 'left' }}
                       >
-                        {t('modal.remove')}
+                        Remove
                       </button>
                     </li>
                   </ul>
