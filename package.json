@@ -16,12 +16,21 @@
   "keywords": [],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm --prefix frontend run build",
-    "start": "npx start-server ./frontend/build",
-    "start:dev": "npx chat-server --port 5001 --clientDir ./frontend/build"
+    "build": "react-scripts build",
+    "start": "npx start-server ./build",
+    "start:dev": "npx chat-server --port 5001 --clientDir ./build"
   },
   "dependencies": {
-    "@hexlet/chat-server": "2.0.4"
+    "@hexlet/chat-server": "2.0.4",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "formik": "^2.4.6",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.2",
+    "react-scripts": "^5.0.1",
+    "web-vitals": "^5.1.0",
+    "yup": "^1.7.0"
   },
   "engines": {
     "node": ">=18"
