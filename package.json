@@ -1,38 +1,17 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "main": "index.js",
-  "description": "",
+  "description": "Chat",
+  "main": "./frontend/src/index.js",
+  "scripts": {
+    "build": "npm run build --prefix frontend",
+    "start": "start-server -s ./frontend/build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd frontend && npm ci"
+  },
   "author": "",
   "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JavierQuinan/fullstack-javascript-project-139.git"
-  },
-  "bugs": {
-    "url": "https://github.com/JavierQuinan/fullstack-javascript-project-139/issues"
-  },
-  "homepage": "https://github.com/JavierQuinan/fullstack-javascript-project-139#readme",
-  "keywords": [],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "react-scripts build",
-    "start": "npx start-server ./build",
-    "start:dev": "npx chat-server --port 5001 --clientDir ./build"
-  },
   "dependencies": {
-    "@hexlet/chat-server": "2.0.4",
-    "@testing-library/jest-dom": "^6.8.0",
-    "@testing-library/react": "^16.3.0",
-    "formik": "^2.4.6",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-router-dom": "^7.8.2",
-    "react-scripts": "^5.0.1",
-    "web-vitals": "^5.1.0",
-    "yup": "^1.7.0"
-  },
-  "engines": {
-    "node": ">=18"
+    "@hexlet/chat-server": "^2.0.4"
   }
 }
