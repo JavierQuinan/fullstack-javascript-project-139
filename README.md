@@ -13,8 +13,10 @@ Este README te deja la app andando **en local** y lista para **deploy** 🤝.
 ---
 
 ## 🔧 Requisitos
-- **Node.js 18.x**
-- **npm** reciente
+
+- **Node.js 18.x LTS** (recomendado 18.20.x)
+- **npm ≥ 9** (vale el que viene con Node 18; si tienes npm 10 también sirve)
+
 
 ---
 
