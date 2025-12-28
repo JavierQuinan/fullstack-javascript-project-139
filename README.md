@@ -141,6 +141,6 @@ fullstack-javascript-project-139/
 
 Este proyecto es parte del programa educativo de Hexlet.
 
-## Autor
+## Autor Francisco Quinteros
 
 Desarrollado como proyecto de aprendizaje en Hexlet.
