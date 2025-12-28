@@ -1,94 +1,146 @@
-### Hexlet tests and linter status:
+# Hexlet Chat Application
 
-[![Actions Status](https://github.com/iPoolito/frontend-project-139/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/iPoolito/frontend-project-139/actions)
+[![Actions Status](https://github.com/JavierQuinan/fullstack-javascript-project-139/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/JavierQuinan/fullstack-javascript-project-139/actions)
 
-### Hexlet tests and linter status:
+Una aplicación de chat en tiempo real construida con tecnologías web modernas.
 
-# ChatAPP
+## Stack Tecnológico
 
-Este proyecto es un chat en tiempo real basado en **React** (frontend) y el servidor de **Hexlet** (backend).  
-A continuación se describen los pasos para ejecutarlo localmente (tanto en desarrollo como en producción), y el enlace al despliegue en **Railway**.
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Redux](https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white)
+![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Formik](https://img.shields.io/badge/Formik-1E40AF?style=for-the-badge&logo=formik&logoColor=white)
+![i18next](https://img.shields.io/badge/i18next-26A69A?style=for-the-badge&logo=i18next&logoColor=white)
 
-## Despliegue en Railway
+## Características
 
-La aplicación está desplegada en [Railway](https://railway.app/).  
-Puedes acceder a la versión en producción aquí:  
-[https://chatapp-production-b85f.up.railway.app/](https://chatapp-production-b85f.up.railway.app/)
+- Comunicación en tiempo real con Socket.IO
+- Gestión de estado con Redux Toolkit
+- Autenticación de usuarios
+- Canales de chat múltiples
+- Interfaz de usuario moderna y responsive
+- Validación de formularios con Formik y Yup
+- Filtro de contenido inapropiado
+- Soporte multiidioma (i18next)
 
----
+## Requisitos Previos
 
-## Uso en local
+- Node.js (versión 14 o superior)
+- npm o yarn
 
-### 1. Clonar el repositorio
+## Instalación
+
+1. Clonar el repositorio:
 
 ```bash
-git clone https://github.com/Shi0-X/ChatAPP.git
-cd ChatAPP
+git clone https://github.com/JavierQuinan/fullstack-javascript-project-139.git
+cd fullstack-javascript-project-139
 ```
 
-### 2. Instalar dependencias
-
-En la raíz (donde está el package.json principal):
+2. Instalar dependencias raíz:
 
 ```bash
-Copiar
 npm install
 ```
 
-Luego, en la carpeta frontend/ (donde está el package.json del frontend):
+3. Instalar dependencias del frontend:
 
 ```bash
-Copiar
 cd frontend
 npm install
 cd ..
 ```
 
-### Modo desarrollo (puerto 3000)
+## Modo Desarrollo
 
-Si deseas desarrollar o modificar el código React con recarga en caliente:
+Para ejecutar la aplicación en modo desarrollo con recarga en caliente:
 
-En una terminal, inicia el servidor de desarrollo de Create React App:
+1. Iniciar el servidor frontend (puerto 3000):
 
 ```bash
 cd frontend
 npm start
-Esto abrirá el frontend en http://localhost:3000.
 ```
 
-(Opcional) En otra terminal, levanta el servidor de Hexlet para manejar las peticiones reales:
+2. En otra terminal, iniciar el servidor backend (puerto 5001):
 
 ```bash
-Copiar
 npx start-server --port 5001
-Corre en http://localhost:5001.
 ```
 
-Tu frontend, corriendo en el puerto 3000, hará peticiones a http://localhost:5001/api/v1/... (ver api.js).
-Si el servidor no está activo, las peticiones (login, canales, etc.) darán errores de red.
+La aplicación estará disponible en `http://localhost:3000`
 
-### Modo producción (puerto 5001)
+## Modo Producción
 
-Para ejecutar el frontend compilado y el backend en un solo puerto (5001):
+Para ejecutar la aplicación en modo producción:
 
-Compila el frontend:
+1. Compilar el frontend:
 
 ```bash
-Copiar
 cd frontend
 npm run build
 cd ..
 ```
 
-Esto genera la carpeta build/ dentro de frontend/.
-
-Inicia el servidor de Hexlet, sirviendo la carpeta estática ./frontend/build:
+2. Iniciar el servidor con archivos estáticos:
 
 ```bash
-Copiar
-npx start-server --port 5001 --static ./frontend/build
-Abre http://localhost:5001 en tu navegador.
+npx start-server --port 5001 --static ./frontend/dist
 ```
 
-La aplicación React (modo producción) se servirá en ese puerto.
-Las peticiones de login, canales, etc. se harán al mismo puerto 5001 (/api/v1/...).
+La aplicación estará disponible en `http://localhost:5001`
+
+## Despliegue
+
+La aplicación está desplegada en Railway:
+
+[https://chatapp-production-b85f.up.railway.app/](https://chatapp-production-b85f.up.railway.app/)
+
+## Estructura del Proyecto
+
+```
+fullstack-javascript-project-139/
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── contexts/
+│   │   ├── slices/
+│   │   ├── locales/
+│   │   └── chatApi/
+│   └── package.json
+├── package.json
+├── Dockerfile
+└── README.md
+```
+
+## Tecnologías Principales
+
+- **React 18.2.0** - Biblioteca de interfaz de usuario
+- **Redux Toolkit 1.9.7** - Gestión de estado
+- **React Router 6.30.0** - Enrutamiento
+- **Bootstrap 5.1.3** - Framework CSS
+- **Socket.IO 4.5.1** - Comunicación en tiempo real
+- **Formik 2.4.6** - Manejo de formularios
+- **Yup 0.32.11** - Validación de esquemas
+- **i18next 24.2.0** - Internacionalización
+- **Hexlet Chat Server 2.0.4** - Servidor backend
+
+## Scripts Disponibles
+
+- `npm start` - Inicia la aplicación en modo desarrollo
+- `npm run build` - Compila la aplicación para producción
+- `npm test` - Ejecuta los tests
+- `npm run lint` - Ejecuta el linter
+
+## Licencia
+
+Este proyecto es parte del programa educativo de Hexlet.
+
+## Autor
+
+Desarrollado como proyecto de aprendizaje en Hexlet.
