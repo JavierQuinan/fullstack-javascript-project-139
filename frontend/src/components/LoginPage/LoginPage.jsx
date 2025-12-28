@@ -44,45 +44,46 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h2>{t('entry')}</h2>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2>{t('entry')}</h2>
 
-      {authError && <div style={{ color: 'red' }}>{authError}</div>}
+        {authError && <div className="auth-form error-message">{authError}</div>}
 
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <div>
-              {/* 👇 Aseguramos que el texto sea visible para Playwright */}
-              <label htmlFor="username">{t('placeholders.login')}</label>
-              <Field id="username" name="username" type="text" />
-              <ErrorMessage name="username" component="div" />
-            </div>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form className="auth-form">
+              <div className="form-group">
+                <label htmlFor="username">{t('placeholders.login')}</label>
+                <Field id="username" name="username" type="text" />
+                <ErrorMessage name="username" component="div" className="error-field" />
+              </div>
 
-            <div>
-              <label htmlFor="password">{t('placeholders.password')}</label>
-              <Field id="password" name="password" type="password" />
-              <ErrorMessage name="password" component="div" />
-            </div>
+              <div className="form-group">
+                <label htmlFor="password">{t('placeholders.password')}</label>
+                <Field id="password" name="password" type="password" />
+                <ErrorMessage name="password" component="div" className="error-field" />
+              </div>
 
-            <button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t('loading') : t('entry')}
-            </button>
-          </Form>
-        )}
-      </Formik>
+              <button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? t('loading') : t('entry')}
+              </button>
+            </Form>
+          )}
+        </Formik>
 
-      <p>
-        {t('noAccount')}
-        {' '}
-        <Link to="/signup">
-          {t('makeRegistration')}
-        </Link>
-      </p>
+        <div className="auth-footer">
+          {t('noAccount')}
+          {' '}
+          <Link to="/signup">
+            {t('makeRegistration')}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

@@ -48,63 +48,65 @@ const SignupPage = () => {
   };
 
   return (
-    <div>
-      <h2>{t('registration')}</h2>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2>{t('registration')}</h2>
 
-      {errors.length > 0 && (
-        <div style={{ color: 'red' }}>
-          {errors.map((err, i) => (
-            <div key={`${i + 1}`}>{err}</div>
-          ))}
-        </div>
-      )}
+        {errors.length > 0 && (
+          <div className="auth-form error-message">
+            {errors.map((err, i) => (
+              <div key={`${i + 1}`}>{err}</div>
+            ))}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="usernameInput">
-            {t('placeholders.username')}
-          </label>
-          <input
-            id="usernameInput"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="passwordInput">
-            {t('placeholders.password')}
-          </label>
-          <input
-            id="passwordInput"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="confirmPasswordInput">
-            {t('placeholders.confirmPassword')}
-          </label>
-          <input
-            id="confirmPasswordInput"
-            type="password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-          />
-        </div>
-        <button type="submit">
-          {t('makeRegistration')}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="usernameInput">
+              {t('placeholders.username')}
+            </label>
+            <input
+              id="usernameInput"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="passwordInput">
+              {t('placeholders.password')}
+            </label>
+            <input
+              id="passwordInput"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="confirmPasswordInput">
+              {t('placeholders.confirmPassword')}
+            </label>
+            <input
+              id="confirmPasswordInput"
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+          </div>
+          <button type="submit">
+            {t('makeRegistration')}
+          </button>
+        </form>
 
-      <p>
-        {t('alreadyHaveAccount')}
-        {' '}
-        <Link to="/login">
-          {t('entry')}
-        </Link>
-      </p>
+        <div className="auth-footer">
+          {t('alreadyHaveAccount')}
+          {' '}
+          <Link to="/login">
+            {t('entry')}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };
