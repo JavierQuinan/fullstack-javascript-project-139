@@ -64,7 +64,7 @@ const ChannelsBox = () => {
                   className="btn-action"
                   title={t('modal.rename')}
                 >
-                  ✏️
+                  Edit
                 </button>
                 <button 
                   type="button" 
@@ -72,7 +72,7 @@ const ChannelsBox = () => {
                   className="btn-action btn-danger"
                   title={t('modal.remove')}
                 >
-                  🗑️
+                  Delete
                 </button>
               </div>
             )}

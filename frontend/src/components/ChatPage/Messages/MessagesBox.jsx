@@ -26,7 +26,7 @@ const MessagesBox = () => {
         </div>
       ) : (
         <div className="no-messages">
-          <p>💬 {t('noMessages') || 'No messages yet'}</p>
+          <p>{t('noMessages') || 'No messages yet'}</p>
         </div>
       )}
     </div>

@@ -60,10 +60,10 @@ export const login = async (username, password) => {
       console.warn('El servidor no devolvió username o token');
     }
 
-    console.log('✅ Login exitoso:', response.data);
+    console.log('Login exitoso:', response.data);
     return response.data;
   } catch (error) {
-    console.error('🚨 Error en login:', error);
+    console.error('Error en login:', error);
     throw error;
   }
 };
@@ -76,10 +76,10 @@ export const signup = async (username, password) => {
 export const getChannels = async () => {
   try {
     const response = await api.get('/channels');
-    console.log('✅ Canales obtenidos:', response.data);
+    console.log('Canales obtenidos:', response.data);
     return response.data;
   } catch (error) {
-    console.error('🚨 Error al obtener canales:', error);
+    console.error('Error al obtener canales:', error);
     throw error;
   }
 };
@@ -87,10 +87,10 @@ export const getChannels = async () => {
 export const getMessages = async () => {
   try {
     const response = await api.get('/messages');
-    console.log('✅ Mensajes obtenidos:', response.data);
+    console.log('Mensajes obtenidos:', response.data);
     return response.data;
   } catch (error) {
-    console.error('🚨 Error al obtener mensajes:', error);
+    console.error('Error al obtener mensajes:', error);
     throw error;
   }
 };

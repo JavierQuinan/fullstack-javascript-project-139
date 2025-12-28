@@ -48,7 +48,7 @@ const MessageForm = () => {
           onChange={(e) => setText(e.target.value)}
         />
         <button type="submit" className="btn-send-message">
-          <span className="send-icon">📤</span> {t('send')}
+          {t('send')}
         </button>
       </form>
     </div>
