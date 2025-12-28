@@ -30,33 +30,51 @@ const ChannelsBox = () => {
   };
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>{t('channelsTitle')}</h2>
-        <button type="button" onClick={handleAddChannel}>+</button>
+    <div className="channels-box">
+      <div className="channels-header">
+        <h5 className="mb-0">{t('channelsTitle')}</h5>
+        <button 
+          type="button" 
+          className="btn-add-channel" 
+          onClick={handleAddChannel}
+          title={t('modal.add')}
+        >
+          +
+        </button>
       </div>
-      <ul>
+      <ul className="channels-list">
         {channels.map((ch) => (
-          <li key={ch.id} style={{ margin: '5px 0' }}>
+          <li 
+            key={ch.id} 
+            className={`channel-item ${ch.id === currentChannelId ? 'active' : ''}`}
+          >
             <button
               type="button"
               onClick={() => handleSelectChannel(ch.id)}
-              style={{ fontWeight: ch.id === currentChannelId ? 'bold' : 'normal' }}
+              className="channel-button"
             >
-              #
-              {' '}
+              <span className="channel-hash">#</span>
               {ch.name}
             </button>
-            <span className="visually-hidden">{t('modal.menu')}</span>
             {ch.removable && (
-              <span style={{ marginLeft: '10px' }}>
-                <button type="button" onClick={() => handleRemoveChannel(ch.id)}>
-                  {t('modal.remove')}
+              <div className="channel-actions">
+                <button 
+                  type="button" 
+                  onClick={() => handleRenameChannel(ch.id)}
+                  className="btn-action"
+                  title={t('modal.rename')}
+                >
+                  ✏️
                 </button>
-                <button type="button" onClick={() => handleRenameChannel(ch.id)}>
-                  {t('modal.rename')}
+                <button 
+                  type="button" 
+                  onClick={() => handleRemoveChannel(ch.id)}
+                  className="btn-action btn-danger"
+                  title={t('modal.remove')}
+                >
+                  🗑️
                 </button>
-              </span>
+              </div>
             )}
           </li>
         ))}

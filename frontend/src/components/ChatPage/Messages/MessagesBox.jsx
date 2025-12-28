@@ -14,21 +14,21 @@ const MessagesBox = () => {
   );
 
   return (
-    <div>
-      {/* "Mensajes" => t('messagesTitle') => "Messages" */}
-      <h2>{t('messagesTitle')}</h2>
-      <ul>
-        {filteredMessages.map((msg) => (
-          <li key={msg.id}>
-            <strong>
-              {msg.username || 'anon'}
-              :
-            </strong>
-            {' '}
-            {msg.body}
-          </li>
-        ))}
-      </ul>
+    <div className="messages-box-container">
+      {filteredMessages.length > 0 ? (
+        <div className="messages-list">
+          {filteredMessages.map((msg) => (
+            <div key={msg.id} className="message-item">
+              <strong className="message-author">{msg.username || 'anon'}</strong>
+              <span className="message-body">{msg.body}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="no-messages">
+          <p>💬 {t('noMessages') || 'No messages yet'}</p>
+        </div>
+      )}
     </div>
   );
 };
