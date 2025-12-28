@@ -37,17 +37,19 @@ const MessageForm = () => {
   };
 
   return (
-    <div>
-      <h3>{t('newMessage')}</h3>
-      <form onSubmit={handleSubmit}>
+    <div className="message-form">
+      <form onSubmit={handleSubmit} className="d-flex gap-2">
         <input
           type="text"
+          className="form-control message-input"
           placeholder={t('placeholders.newMessage')}
           aria-label={t('newMessage')}
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-        <button type="submit">{t('send')}</button>
+        <button type="submit" className="btn-send-message">
+          <span className="send-icon">📤</span> {t('send')}
+        </button>
       </form>
     </div>
   );
