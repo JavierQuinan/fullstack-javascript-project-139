@@ -11,7 +11,6 @@ import MessageForm from './Messages/MessageForm.jsx';
 import Add from './Modals/Add.jsx';
 import Remove from './Modals/Remove.jsx';
 import Rename from './Modals/Rename.jsx';
-import ChatNavbar from '../Navbar/ChatNavbar.jsx';
 
 const ChatPage = () => {
   const { isAuthenticated } = useAuth();
@@ -65,7 +64,6 @@ const ChatPage = () => {
 
   return (
     <>
-      <ChatNavbar />
       <div style={{ display: 'flex', height: '100vh' }}>
         <div
           style={{
