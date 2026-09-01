@@ -1,7 +1,7 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "Chat",
+  "description": "React realtime chat client with Redux Toolkit, Socket.IO channels and authentication flows.",
   "main": "./frontend/src/index.js",
   "scripts": {
     "build": "npm run build --prefix frontend",
@@ -9,7 +9,17 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "cd frontend && npm ci"
   },
-  "author": "",
+  "keywords": [
+    "react",
+    "redux-toolkit",
+    "socket.io",
+    "realtime-chat"
+  ],
+  "author": "Francisco Quinteros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JavierQuinan/fullstack-javascript-project-139.git"
+  },
   "license": "ISC",
   "dependencies": {
     "@hexlet/chat-server": "^2.0.4"
