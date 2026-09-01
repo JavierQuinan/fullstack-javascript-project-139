@@ -1,146 +1,141 @@
-# Hexlet Chat Application
+<div align="center">
+
+# Realtime Chat
+
+### React application with channels, authentication and Socket.IO events
 
 [![Actions Status](https://github.com/JavierQuinan/fullstack-javascript-project-139/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/JavierQuinan/fullstack-javascript-project-139/actions)
+![React](https://img.shields.io/badge/React-18-20232A?logo=react&logoColor=61DAFB)
+![Redux Toolkit](https://img.shields.io/badge/Redux-Toolkit-764ABC?logo=redux&logoColor=white)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-Realtime-010101?logo=socketdotio&logoColor=white)
+![License](https://img.shields.io/badge/license-ISC-blue)
 
-Una aplicación de chat en tiempo real construida con tecnologías web modernas.
+</div>
 
-## Stack Tecnológico
+## Overview
 
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Redux](https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white)
-![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
-![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
-![Formik](https://img.shields.io/badge/Formik-1E40AF?style=for-the-badge&logo=formik&logoColor=white)
-![i18next](https://img.shields.io/badge/i18next-26A69A?style=for-the-badge&logo=i18next&logoColor=white)
+Realtime Chat is a React application that consumes the Hexlet Chat Server API and provides authenticated multi-channel messaging with real-time updates.
 
-## Características
+This repository is maintained as **verifiable React / frontend engineering evidence**. The README documents the capabilities supported by the current dependencies and codebase and avoids presenting educational infrastructure as a custom backend implementation.
 
-- Comunicación en tiempo real con Socket.IO
-- Gestión de estado con Redux Toolkit
-- Autenticación de usuarios
-- Canales de chat múltiples
-- Interfaz de usuario moderna y responsive
-- Validación de formularios con Formik y Yup
-- Filtro de contenido inapropiado
-- Soporte multiidioma (i18next)
+## Verified stack
 
-## Requisitos Previos
+`React 18` · `Redux Toolkit` · `React Router` · `Socket.IO Client` · `Axios` · `Formik` · `Yup` · `i18next` · `React Bootstrap` · `Rollbar React` · `leo-profanity`
 
-- Node.js (versión 14 o superior)
-- npm o yarn
+## Implemented capabilities
 
-## Instalación
+- user authentication flow
+- protected application routes
+- multiple chat channels
+- real-time message/channel events through Socket.IO
+- global client state with Redux Toolkit
+- forms with Formik and Yup validation
+- internationalization with react-i18next / i18next
+- profanity filtering through `leo-profanity`
+- Bootstrap / React Bootstrap UI components
+- optional frontend error reporting through Rollbar dependencies
+- production frontend build through Create React App tooling
 
-1. Clonar el repositorio:
+## Architecture
+
+```text
+React UI
+   │
+   ├── React Router
+   ├── Formik / Yup
+   │
+   ▼
+Redux Toolkit state
+   │
+   ├── HTTP requests ──────> Hexlet Chat Server API
+   │
+   └── Socket.IO client ───> realtime server events
+```
+
+The backend dependency in this repository is `@hexlet/chat-server`; this project should therefore be read primarily as frontend/realtime-client evidence rather than as proof of a custom Node.js chat backend.
+
+## Installation
 
 ```bash
 git clone https://github.com/JavierQuinan/fullstack-javascript-project-139.git
 cd fullstack-javascript-project-139
-```
-
-2. Instalar dependencias raíz:
-
-```bash
 npm install
 ```
 
-3. Instalar dependencias del frontend:
+The root `postinstall` installs the frontend dependencies with `npm ci`.
 
-```bash
-cd frontend
-npm install
-cd ..
-```
+## Development
 
-## Modo Desarrollo
-
-Para ejecutar la aplicación en modo desarrollo con recarga en caliente:
-
-1. Iniciar el servidor frontend (puerto 3000):
+Run the frontend:
 
 ```bash
 cd frontend
 npm start
 ```
 
-2. En otra terminal, iniciar el servidor backend (puerto 5001):
+Run the development chat server separately, for example:
 
 ```bash
 npx start-server --port 5001
 ```
 
-La aplicación estará disponible en `http://localhost:3000`
+The frontend package currently proxies API requests to `http://localhost:5001`.
 
-## Modo Producción
+## Build
 
-Para ejecutar la aplicación en modo producción:
-
-1. Compilar el frontend:
+From the repository root:
 
 ```bash
-cd frontend
 npm run build
-cd ..
 ```
 
-2. Iniciar el servidor con archivos estáticos:
+This delegates to the frontend build and outputs the CRA build to `frontend/dist`.
 
-```bash
-npx start-server --port 5001 --static ./frontend/dist
+## Testing status
+
+Testing Library packages are present in the frontend dependencies, but the repository does **not** currently expose a reliable non-interactive test command at the root: the root `npm test` script intentionally exits with an error. Automated test evidence should therefore not be claimed until a CI-safe test script and meaningful test suite are verified.
+
+The same applies to linting: ESLint packages/configuration exist in the frontend, but there is no documented root `npm run lint` script in the current package metadata.
+
+## Repository structure
+
+```text
+frontend/
+  public/
+  src/
+    components/
+    contexts/
+    slices/
+    locales/
+    chatApi/
+  package.json
+package.json
+Dockerfile
+README.md
 ```
 
-La aplicación estará disponible en `http://localhost:5001`
+## Hardening backlog
 
-## Despliegue
+Before promoting this repository as a flagship frontend showcase:
 
-La aplicación está desplegada en Railway:
+- add a deterministic CI test command and verified component/integration tests;
+- expose a repeatable lint command;
+- verify or replace any external deployment URL before advertising a live demo;
+- document environment/error-reporting configuration without exposing tokens;
+- review dependency age and upgrade strategy for the CRA-based stack;
+- add screenshots or a sanitized live demo once current behavior is revalidated.
 
-[https://chatapp-production-b85f.up.railway.app/](https://chatapp-production-b85f.up.railway.app/)
+## Portfolio classification
 
-## Estructura del Proyecto
+**Category:** React / realtime frontend evidence  
+**Visibility:** Public  
+**Portfolio priority:** Medium-high  
+**Current recommendation:** Strong supporting React evidence; candidate for featured status after tests, lint and demo verification are completed.
 
-```
-fullstack-javascript-project-139/
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── contexts/
-│   │   ├── slices/
-│   │   ├── locales/
-│   │   └── chatApi/
-│   └── package.json
-├── package.json
-├── Dockerfile
-└── README.md
-```
+## Author
 
-## Tecnologías Principales
+Francisco Quinteros — [GitHub](https://github.com/JavierQuinan)
 
-- **React 18.2.0** - Biblioteca de interfaz de usuario
-- **Redux Toolkit 1.9.7** - Gestión de estado
-- **React Router 6.30.0** - Enrutamiento
-- **Bootstrap 5.1.3** - Framework CSS
-- **Socket.IO 4.5.1** - Comunicación en tiempo real
-- **Formik 2.4.6** - Manejo de formularios
-- **Yup 0.32.11** - Validación de esquemas
-- **i18next 24.2.0** - Internacionalización
-- **Hexlet Chat Server 2.0.4** - Servidor backend
+## License
 
-## Scripts Disponibles
-
-- `npm start` - Inicia la aplicación en modo desarrollo
-- `npm run build` - Compila la aplicación para producción
-- `npm test` - Ejecuta los tests
-- `npm run lint` - Ejecuta el linter
-
-## Licencia
-
-Este proyecto es parte del programa educativo de Hexlet.
-
-## Autor Francisco Quinteros
-
-Desarrollado como proyecto de aprendizaje en Hexlet.
+ISC. This project was developed as part of the Hexlet learning path.
