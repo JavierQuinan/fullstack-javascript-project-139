@@ -1,9 +1,18 @@
 /* eslint-env jest */
 import { render, screen } from '@testing-library/react';
-import App from './components/App.jsx';
+import { MemoryRouter } from 'react-router-dom';
+import AuthProvider from './contexts/AuthProvider.jsx';
+import ChatNavbar from './components/Navbar/ChatNavbar.jsx';
 
-test('renders text from App component', () => {
-  render(<App />);
-  const heading = screen.getByText(/Hexlet Chat/i);
-  expect(heading).toBeInTheDocument();
+test('renders the chat brand for an anonymous user', () => {
+  render(
+    <AuthProvider>
+      <MemoryRouter>
+        <ChatNavbar />
+      </MemoryRouter>
+    </AuthProvider>,
+  );
+
+  expect(screen.getByRole('link', { name: /Hexlet Chat/i })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /Log out/i })).not.toBeInTheDocument();
 });
