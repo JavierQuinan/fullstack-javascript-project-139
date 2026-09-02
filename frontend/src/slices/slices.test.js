@@ -1,22 +1,26 @@
 /* eslint-env jest */
-import channelsReducer, { setCurrentChannelId } from './channelsSlice.js';
-import messagesReducer, { messageReceived } from './messagesSlice.js';
+import modalReducer, { openModal, closeModal } from './modalSlice.js';
 
-describe('chat reducers', () => {
-  test('sets the active channel id', () => {
-    const state = channelsReducer(undefined, setCurrentChannelId(42));
+describe('modal reducer', () => {
+  test('opens a channel modal with its context', () => {
+    const state = modalReducer(undefined, openModal({ type: 'rename', channelId: 42 }));
 
-    expect(state.currentChannelId).toBe(42);
-    expect(state.items).toEqual([]);
+    expect(state).toEqual({
+      isOpen: true,
+      type: 'rename',
+      channelId: 42,
+    });
   });
 
-  test('appends a realtime message without mutating the previous state', () => {
-    const previous = { items: [{ id: 1, body: 'hola', channelId: 1 }] };
-    const incoming = { id: 2, body: 'mundo', channelId: 1 };
+  test('closes a modal and clears its context', () => {
+    const previous = { isOpen: true, type: 'remove', channelId: 7 };
+    const state = modalReducer(previous, closeModal());
 
-    const next = messagesReducer(previous, messageReceived(incoming));
-
-    expect(next.items).toEqual([previous.items[0], incoming]);
-    expect(previous.items).toHaveLength(1);
+    expect(state).toEqual({
+      isOpen: false,
+      type: null,
+      channelId: null,
+    });
+    expect(previous).toEqual({ isOpen: true, type: 'remove', channelId: 7 });
   });
 });
